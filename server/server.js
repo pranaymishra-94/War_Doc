@@ -15,11 +15,11 @@ connectDB();
 
 const app = express();
 
-// --- UPDATE THIS SECTION ---
-// Define the list of allowed origins (URLs)
- const allowedOrigins = [
+// --- THIS IS THE FIX ---
+// Add your live Vercel URL to the list of allowed origins
+const allowedOrigins = [
   'http://localhost:5173',
-  'https://your-project-name.vercel.app' 
+  'https://war-doc.vercel.app' // The URL from your screenshot
 ];
 
 app.use(cors({
@@ -31,7 +31,7 @@ app.use(cors({
     }
   }
 }));
-// --- END OF UPDATE ---
+// --- END OF FIX ---
 
 app.use(express.json());
 
