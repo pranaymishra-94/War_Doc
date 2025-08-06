@@ -5,29 +5,40 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 
-// Import Route Files
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
-import documentRoutes from './routes/documentRoutes.js'; // <-- Import document routes
+import documentRoutes from './routes/documentRoutes.js';
 
-// Load environment variables
 dotenv.config();
-
-// Connect to Database
 connectDB();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// --- UPDATE THIS SECTION ---
+// Define the list of allowed origins (URLs)
+const allowedOrigins = [
+  'http://localhost:5173', // Your local frontend for development
+  // We will add your live frontend URL here later
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+// --- END OF UPDATE ---
+
 app.use(express.json());
 
-// Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/upload', uploadRoutes);
-app.use('/api/documents', documentRoutes); // <-- Mount document routes
+app.use('/api/documents', documentRoutes);
 
 const PORT = process.env.PORT || 5000;
 

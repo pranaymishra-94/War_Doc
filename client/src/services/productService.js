@@ -2,10 +2,14 @@
 
 import axios from 'axios';
 
-// Define the base URLs for our different API endpoints
-const API_URL_PRODUCTS = 'http://localhost:5001/api/products';
-const API_URL_DOCUMENTS = 'http://localhost:5001/api/documents';
-const UPLOAD_URL = 'http://localhost:5001/api/upload';
+// Use the environment variable for the base URL.
+// Vite requires the prefix VITE_ for environment variables to be exposed to the client.
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+// Construct the full URLs for each endpoint
+const API_URL_PRODUCTS = `${API_BASE_URL}/api/products`;
+const API_URL_DOCUMENTS = `${API_BASE_URL}/api/documents`;
+const UPLOAD_URL = `${API_BASE_URL}/api/upload`;
 
 // --- Product Functions ---
 
@@ -81,7 +85,6 @@ const createDocument = async (documentData) => {
   }
 };
 
-// --- ADD THIS NEW FUNCTION ---
 const deleteDocument = async (documentId) => {
   try {
     const response = await axios.delete(`${API_URL_DOCUMENTS}/${documentId}`);
@@ -120,7 +123,7 @@ const productService = {
   updateProduct,
   getDocuments,
   createDocument,
-  deleteDocument, // <-- Export the new function
+  deleteDocument,
   uploadFile,
 };
 
