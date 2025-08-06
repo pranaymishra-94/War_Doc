@@ -1,10 +1,12 @@
+// server/controllers/authController.js
+
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 
 // Helper function to sign a token
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expiresIn: process.env.JWT_EXPIRES_IN || '90d',
   });
 };
 
@@ -15,13 +17,18 @@ export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    // Defensive check: Ensure required fields are provided
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide name, email, and password' });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: 'User already exists' });
+      return res.status(400).json({ success: false, message: 'User with this email already exists' });
     }
 
-    // Create new user (password is automatically hashed by model middleware)
+    // Create a new user
     const newUser = await User.create({
       name,
       email,
@@ -31,66 +38,59 @@ export const register = async (req, res) => {
     // Generate a token
     const token = signToken(newUser._id);
 
-    // Send back the token and user data
+    // Send back a clean user object without the password
+    const userResponse = {
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    };
+
     res.status(201).json({
       success: true,
       token,
       data: {
-        user: newUser,
-      },
+        user: userResponse
+      }
     });
 
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    // Log the detailed error on the server for debugging
+    console.error('REGISTER ERROR:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+// Login and getMe functions remain the same...
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // 1) Check if email and password were provided
     if (!email || !password) {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
-
-    // 2) Find user and check if password is correct
-    // We must explicitly select the password field since we set `select: false` in the schema
     const user = await User.findOne({ email }).select('+password');
-
-    // Use the `matchPassword` method we added to the User model
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ success: false, message: 'Incorrect email or password' });
     }
-
-    // 3) If everything is correct, send token to client
     const token = signToken(user._id);
-
     res.status(200).json({
       success: true,
       token,
     });
-
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+    console.error('LOGIN ERROR:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
-// Add this function to server/controllers/authController.js
-
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
 export const getMe = async (req, res) => {
-  // Because our `protect` middleware runs first,
-  // the user's data is already attached to the request object as `req.user`.
-  const user = await User.findById(req.user.id);
-
-  res.status(200).json({
-    success: true,
-    data: user,
-  });
+  try {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error('GETME ERROR:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
 };
