@@ -17,9 +17,9 @@ const app = express();
 
 // --- UPDATE THIS SECTION ---
 // Define the list of allowed origins (URLs)
-const allowedOrigins = [
-  'http://localhost:5173', // Your local frontend for development
-  // We will add your live frontend URL here later
+ const allowedOrigins = [
+  'http://localhost:5173',
+  'https://your-project-name.vercel.app' 
 ];
 
 app.use(cors({
