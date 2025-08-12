@@ -1,7 +1,5 @@
-// server/routes/documentRoutes.js
 
 import express from 'express';
-// Import all controller functions
 import { 
   getDocuments, 
   createDocument, 
@@ -17,7 +15,6 @@ router.route('/')
   .get(getDocuments)
   .post(createDocument);
 
-// --- ADD THIS NEW ROUTE ---
 router.route('/:id')
   .delete(deleteDocument); // DELETE /api/documents/some_id
 
