@@ -1,4 +1,3 @@
-// server/routes/uploadRoutes.js
 
 import express from 'express';
 import upload from '../config/cloudinary.js';
@@ -21,8 +20,7 @@ router.post('/', protect, upload.single('file'), (req, res) => {
       url: req.file.path, 
     });
   } else {
-    // This case would typically be caught by multer's error handling,
-    // but it's good practice to have a fallback.
+    // multer's error handling,
     res.status(400).json({ message: 'File upload failed. No file received.' });
   }
 });
