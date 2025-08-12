@@ -1,10 +1,10 @@
-// server/models/User.js
+
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
-  // ... name and email fields remain the same
+  
   name: {
     type: String,
     required: [true, 'Please provide a name'],
@@ -38,7 +38,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// --- ADD THIS METHOD ---
 // Method to compare entered password with the hashed password in the database
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
