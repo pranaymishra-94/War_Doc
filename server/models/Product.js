@@ -1,4 +1,3 @@
-// server/models/Product.js
 
 import mongoose from 'mongoose';
 
@@ -34,7 +33,7 @@ const productSchema = new mongoose.Schema({
     type: String,
   },
 }, {
-  timestamps: true, // Adds createdAt and updatedAt fields
+  timestamps: true,
 });
 
 const Product = mongoose.model('Product', productSchema);
