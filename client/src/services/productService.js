@@ -1,18 +1,16 @@
-// src/services/productService.js
 
 import axios from 'axios';
 
-// Use the environment variable for the base URL.
+// environment variable for the base URL.
 // Vite requires the prefix VITE_ for environment variables to be exposed to the client.
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-// Construct the full URLs for each endpoint
+// URLs for each endpoint
 const API_URL_PRODUCTS = `${API_BASE_URL}/api/products`;
 const API_URL_DOCUMENTS = `${API_BASE_URL}/api/documents`;
 const UPLOAD_URL = `${API_BASE_URL}/api/upload`;
 
-// --- Product Functions ---
-
+// Product Functions
 const getProducts = async () => {
   try {
     const response = await axios.get(API_URL_PRODUCTS);
@@ -63,7 +61,7 @@ const updateProduct = async (productId, productData) => {
   }
 };
 
-// --- Document Functions ---
+// Document Functions
 
 const getDocuments = async () => {
   try {
@@ -95,7 +93,7 @@ const deleteDocument = async (documentId) => {
   }
 };
 
-// --- Upload Function ---
+//Upload Function
 
 const uploadFile = async (file) => {
   const formData = new FormData();
@@ -114,7 +112,6 @@ const uploadFile = async (file) => {
   }
 };
 
-// Export all functions
 const productService = {
   getProducts,
   createProduct,
