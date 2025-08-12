@@ -1,9 +1,7 @@
-// server/models/Document.js
 
 import mongoose from 'mongoose';
 
 const documentSchema = new mongoose.Schema({
-  // Link this document to a specific user
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
