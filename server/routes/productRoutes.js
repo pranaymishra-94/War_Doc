@@ -1,7 +1,5 @@
-// server/routes/productRoutes.js
 
 import express from 'express';
-// Import all controller functions
 import { 
   getProducts, 
   createProduct, 
@@ -13,13 +11,11 @@ import { protect } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.use(protect);
-
+// CRUD Operations
 router.route('/')
   .get(getProducts)
   .post(createProduct);
 
-// --- UPDATE THIS ROUTE ---
-// Add the PUT method for updating
 router.route('/:id')
   .put(updateProduct) // PUT /api/products/some_id
   .delete(deleteProduct);
