@@ -1,127 +1,123 @@
-
 import axios from 'axios';
 
-// environment variable for the base URL.
-// Vite requires the prefix VITE_ for environment variables to be exposed to the client.
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+// Get the API URL from the environment variables
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
-// URLs for each endpoint
-const API_URL_PRODUCTS = `${API_BASE_URL}/api/products`;
-const API_URL_DOCUMENTS = `${API_BASE_URL}/api/documents`;
-const UPLOAD_URL = `${API_BASE_URL}/api/upload`;
+const api = axios.create({
+  baseURL: API_URL,
+});
 
-// Product Functions
-const getProducts = async () => {
+// Use an interceptor to add the auth token to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// --- Product (Warranty) Functions ---
+
+export const getProducts = async () => {
   try {
-    const response = await axios.get(API_URL_PRODUCTS);
-    return response.data;
+    const res = await api.get('/api/products');
+    return res.data.data;
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error('Error fetching products:', error.response?.data || error.message);
     throw error;
   }
 };
 
-const createProduct = async (productData) => {
+export const getProductById = async (id) => {
   try {
-    const response = await axios.post(API_URL_PRODUCTS, productData);
-    return response.data;
+    const res = await api.get(`/api/products/${id}`);
+    return res.data.data;
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error fetching product by ID:', error.response?.data || error.message);
     throw error;
   }
 };
 
-const deleteProduct = async (productId) => {
+export const createProduct = async (productData) => {
   try {
-    const response = await axios.delete(`${API_URL_PRODUCTS}/${productId}`);
-    return response.data;
+    const res = await api.post('/api/products', productData);
+    return res.data.data;
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error creating product:', error.response?.data || error.message);
     throw error;
   }
 };
 
-const getProductById = async (productId) => {
+export const updateProduct = async (id, productData) => {
   try {
-    const response = await axios.get(`${API_URL_PRODUCTS}/${productId}`);
-    return response.data;
+    const res = await api.put(`/api/products/${id}`, productData);
+    return res.data.data;
   } catch (error) {
-    console.error('Error fetching product by ID:', error);
+    console.error('Error updating product:', error.response?.data || error.message);
     throw error;
   }
 };
 
-const updateProduct = async (productId, productData) => {
+export const deleteProduct = async (id) => {
   try {
-    const response = await axios.put(`${API_URL_PRODUCTS}/${productId}`, productData);
-    return response.data;
+    const res = await api.delete(`/api/products/${id}`);
+    return res.data.data;
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error('Error deleting product:', error.response?.data || error.message);
     throw error;
   }
 };
 
-// Document Functions
 
-const getDocuments = async () => {
+// --- Document Functions ---
+
+export const getDocuments = async () => {
   try {
-    const response = await axios.get(API_URL_DOCUMENTS);
-    return response.data;
+    const res = await api.get('/api/documents');
+    return res.data.data;
   } catch (error) {
-    console.error('Error fetching documents:', error);
+    console.error('Error fetching documents:', error.response?.data || error.message);
     throw error;
   }
 };
 
-const createDocument = async (documentData) => {
+export const createDocument = async (documentData) => {
+    try {
+        const res = await api.post('/api/documents', documentData);
+        return res.data.data;
+    } catch (error) {
+        console.error('Error creating document record:', error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+        const res = await api.post('/api/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return res.data; // The upload route returns { success: true, data: { url: '...' } }
+    } catch (error) {
+        console.error('Error uploading file:', error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const deleteDocument = async (id) => {
   try {
-    const response = await axios.post(API_URL_DOCUMENTS, documentData);
-    return response.data;
+    const res = await api.delete(`/api/documents/${id}`);
+    return res.data.data;
   } catch (error) {
-    console.error('Error creating document record:', error);
+    console.error('Error deleting document:', error.response?.data || error.message);
     throw error;
   }
 };
-
-const deleteDocument = async (documentId) => {
-  try {
-    const response = await axios.delete(`${API_URL_DOCUMENTS}/${documentId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting document record:', error);
-    throw error;
-  }
-};
-
-//Upload Function
-
-const uploadFile = async (file) => {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    const response = await axios.post(UPLOAD_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    throw error;
-  }
-};
-
-const productService = {
-  getProducts,
-  createProduct,
-  deleteProduct,
-  getProductById,
-  updateProduct,
-  getDocuments,
-  createDocument,
-  deleteDocument,
-  uploadFile,
-};
-
-export default productService;
