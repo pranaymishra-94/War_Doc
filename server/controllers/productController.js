@@ -13,6 +13,26 @@ export const getProducts = async (req, res) => {
   }
 };
 
+export const getProductById = async (req, res) => {
+      try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+          return res.status(404).json({ success: false, message: 'Product not found' });
+        }
+
+        // Make sure user owns the product
+        if (product.user.toString() !== req.user.id) {
+          return res.status(401).json({ success: false, message: 'Not authorized' });
+        }
+
+        res.json({ success: true, data: product });
+      } catch (error) {
+        res.status(500).json({ success: false, message: 'Server Error' });
+      }
+    };
+
+
 export const createProduct = async (req, res) => {
   const { productName, category, purchaseDate, warrantyEndDate } = req.body;
   try {
