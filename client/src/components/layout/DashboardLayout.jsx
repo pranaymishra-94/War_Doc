@@ -1,112 +1,93 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-// Corrected import statement
-import * as productService from '../services/productService.js';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+// Corrected import path from ../ to ../../
+import { AuthContext } from '../../context/AuthContext';
 
-const DashboardPage = () => {
-    const [productCount, setProductCount] = useState(0);
-    const [documentCount, setDocumentCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const { user } = useContext(AuthContext);
+const DashboardLayout = () => {
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!user) return;
-            try {
-                setLoading(true);
-                // Fetch both counts in parallel for better performance
-                const [products, documents] = await Promise.all([
-                    productService.getProducts(),
-                    productService.getDocuments()
-                ]);
-
-                if (Array.isArray(products)) {
-                    setProductCount(products.length);
-                }
-                if (Array.isArray(documents)) {
-                    setDocumentCount(documents.length);
-                }
-            } catch (error) {
-                console.error("Failed to fetch dashboard data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [user]);
-
-    if (loading) {
-        return <div className="p-8"><p>Loading dashboard...</p></div>;
-    }
-
+  if (!authContext) {
     return (
-        <div className="p-4 sm:p-6 lg:p-8">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">Dashboard Overview</h1>
-            <p className="mt-1 text-sm text-gray-600">
-                Here's a quick summary of your saved items.
-            </p>
-
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {/* Warranties Card */}
-                <div className="overflow-hidden rounded-lg bg-white shadow">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.471l-2.064 2.064-1.414-1.414 2.064-2.064a1.5 1.5 0 012.121 2.121zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" />
-                                </svg>
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="truncate text-sm font-medium text-gray-500">Total Warranties</dt>
-                                    <dd>
-                                        <div className="text-lg font-medium text-gray-900">{productCount}</div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-gray-50 px-5 py-3">
-                        <div className="text-sm">
-                            <Link to="/warranties" className="font-medium text-indigo-700 hover:text-indigo-900">
-                                View all
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Documents Card */}
-                <div className="overflow-hidden rounded-lg bg-white shadow">
-                    <div className="p-5">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div className="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt className="truncate text-sm font-medium text-gray-500">Total Documents</dt>
-                                    <dd>
-                                        <div className="text-lg font-medium text-gray-900">{documentCount}</div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-gray-50 px-5 py-3">
-                        <div className="text-sm">
-                            <Link to="/documents" className="font-medium text-indigo-700 hover:text-indigo-900">
-                                View all
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-xl font-semibold text-red-600">
+          Error: AuthContext is not available.
+        </p>
+      </div>
     );
+  }
+
+  const { user, logout } = authContext;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const baseLinkClass = "flex items-center px-4 py-2 text-sm font-medium rounded-md";
+  const inactiveLinkClass = "text-gray-600 hover:bg-gray-100 hover:text-gray-900";
+  const activeLinkClass = "bg-indigo-100 text-indigo-600";
+
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="hidden md:flex md:flex-shrink-0">
+        <div className="flex w-64 flex-col">
+          <div className="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 bg-white pt-5">
+            <div className="flex flex-shrink-0 items-center px-4">
+               <span className="text-2xl font-bold text-indigo-600">WarrantyTrack</span>
+            </div>
+            <div className="mt-5 flex flex-grow flex-col">
+              <nav className="flex-1 space-y-1 px-2 pb-4">
+                <NavLink
+                  to="/dashboard"
+                  end
+                  className={({ isActive }) => `${baseLinkClass} ${isActive ? activeLinkClass : inactiveLinkClass}`}
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/warranties"
+                  className={({ isActive }) => `${baseLinkClass} ${isActive ? activeLinkClass : inactiveLinkClass}`}
+                >
+                  Warranties
+                </NavLink>
+                <NavLink
+                  to="/documents"
+                  className={({ isActive }) => `${baseLinkClass} ${isActive ? activeLinkClass : inactiveLinkClass}`}
+                >
+                  Documents
+                </NavLink>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Header */}
+        <div className="relative z-10 flex h-16 flex-shrink-0 bg-white shadow-sm">
+           <div className="flex flex-1 items-center justify-end px-4 sm:px-6 lg:px-8">
+             <p className="text-sm text-gray-700">
+               Welcome, <span className="font-semibold">{user ? user.name : 'Guest'}</span>
+             </p>
+             <button
+               onClick={handleLogout}
+               className="ml-4 inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+             >
+               Logout
+             </button>
+           </div>
+        </div>
+        
+        {/* Main scrollable area */}
+        <main className="flex-1 overflow-y-auto focus:outline-none">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
 };
 
-export default DashboardPage;
+export default DashboardLayout;
