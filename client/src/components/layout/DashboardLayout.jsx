@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-// Corrected import path from ../ to ../../
+
 import { AuthContext } from '../../context/AuthContext';
 
 const DashboardLayout = () => {
