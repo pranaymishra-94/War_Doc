@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 // This path is critical and must go up two levels.
-import productService from '../../services/productService';
+import productService from '../../services/productService.js';
 
 const AddProductForm = ({ onProductAdded }) => {
   const [formData, setFormData] = useState({
