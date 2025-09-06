@@ -18,6 +18,7 @@ router.route('/')
 
 router.route('/:id')
   .put(updateProduct) // PUT /api/products/some_id
+  .get(getProductById)
   .delete(deleteProduct);
 
 export default router;
